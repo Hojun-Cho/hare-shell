@@ -42,6 +42,15 @@ fullbuf(io *f, int c)
 	return *f->bufp++ = c;
 }
 
+io*
+openfd(int fd)
+{
+	io *f = new(io);
+	f->fd = fd;
+	f->bufp = f->ebuf = f->buf;
+	f->strp = 0;
+}
+
 void
 pchr(io *b, int c)
 {
@@ -108,5 +117,3 @@ pfmt(io *f, char *fmt, ...)
 	va_end(ap);
 	flush(f);
 }
-
-

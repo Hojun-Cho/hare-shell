@@ -11,7 +11,7 @@ typedef struct{
 	char *bufp, *ebuf, *strp, buf[NBUF];
 }io;
 
-extern io *err;
+extern io *io_err;
 
 long Write(int fd, void *buf, long cnt);
 int fullbuf(io *f, int c);

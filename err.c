@@ -5,18 +5,18 @@
 void
 Abort(void)
 {
-	pfmt(err, "aborting\n");
-	flush(err);
+	pfmt(io_err, "aborting\n");
+	flush(io_err);
 	Exit("aborting");
 }
 
 void
 Panic(char *s, int n)
 {
-	pfmt(err, "rc: ");
-	pfmt(err, s, n);
-	pchr(err, '\n');
-	flush(err);
+	pfmt(io_err, "rc: ");
+	pfmt(io_err, s, n);
+	pchr(io_err, '\n');
+	flush(io_err);
 	Abort();
 }
 
