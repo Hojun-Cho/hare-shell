@@ -3,6 +3,8 @@
 #include "err.h"
 #include "fmt.h"
 
+#define PATH_MAX 512
+
 void
 print_pid(pid_t pid)
 {
@@ -48,13 +50,34 @@ print_maps(pid_t pid)
 	unsigned long writable = 0, total = 0, shared = 0;
 
 	sprintf(fname, "/proc/%ld/maps", (long)pid);
-	f = fopen(fname, "r");
+	FILE *f = fopen(fname, "r");
 	if (f == 0)
-		Panic("%s: %d\n", buf, errno);
+		Panic("%s: %d\n", fname, errno);
 
 	while (!feof(f))
 	{
-		char buf[PATH_MA
+		char buf[PATH_MAX + 100], perm[5], dev[6], mapname[PATH_MAX];
+		unsigned long begin, end, size, inode, foo;
+		int n;
+		
+		if (fgets(buf, sizeof(buf), f) == 0)
+			break;
+		mapname[0] = '\0';
+		sscanf(buf, "%lx-%lx %4s %lx %5s %ld %s", &begin, &end, perm,
+			&foo, dev, &inode, mapname);
+		size = end - begin;
+		total += size;
+		if (perm[3] == 'p')
+		{
+			if (perm[1] == 'w')
+				writable += size;
+		}
+		else if (perm[3] =='s')
+			shared += size;
+		else 
+			Panic("unable to parse permission string: %s\n", perm);
+		n = sprintf(buf, "%08lx (%ld KB)", begin, (end - begin)/1024);
+		fwrite(buf, sizeof(char), n, stdout);	
 	}
 }
 
